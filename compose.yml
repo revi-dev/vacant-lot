@@ -1,0 +1,67 @@
+services:
+  dev:
+    build:
+      context: .
+      dockerfile: ./environments/Dockerfile
+      args:
+        - PROJECT_NAME=${PROJECT_NAME}
+        - BASE_IMAGE=${BASE_IMAGE}
+        - PYTHON_VERSION=${PYTHON_VERSION}
+        - USER_NAME=${USER_NAME}
+        - GROUP_NAME=${GROUP_NAME}
+        - UID=${UID}
+        - GID=${GID}
+    
+    image: ${PROJECT_NAME}
+    container_name: ${PROJECT_NAME}
+    
+    user: ${UID:-1000}:${GID:-1000}
+    
+    shm_size: '32gb'
+    ports:
+      - "8080:8080"
+      - "8888:8888"
+    volumes:
+      - type: bind
+        source: .
+        target: /home/${USER_NAME}/workspace
+      - type: bind
+        source: ${PACKAGE_DIRECTORY}
+        target: /home/${USER_NAME}/packages
+      - type: volume
+        source: myvolumes
+        target: /home/${USER_NAME}/share
+    tty: true
+    deploy:
+      resources:
+        reservations:
+          devices:
+          - driver: nvidia
+            count: 1
+            capabilities: [gpu]
+    cap_add:
+      - SYS_NICE
+    networks:
+      - mynet
+
+  mlflow:
+    image: mlflow-server:latest
+    container_name: ${PROJECT_NAME}-mlflow-server
+    ports:
+      - 5000:5000
+    volumes:
+      - type: bind
+        source: ./outputs/mlflow
+        target: /usr/mlflow
+    networks:
+      - mynet
+
+volumes:
+  myvolumes:
+    name: ${PROJECT_NAME}-volumes
+
+
+networks:
+  mynet:
+    driver: bridge
+    name: ${PROJECT_NAME}-net

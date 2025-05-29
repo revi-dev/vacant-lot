@@ -1,0 +1,16 @@
+config
+data
+environments
+models
+outputs
+src
+.env
+.coverage
+.dockerignore
+.git
+.github
+.gitignore
+.mypy_cache
+.pytest_cache
+.venv
+*.code-workspace
