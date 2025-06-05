@@ -1,3 +1,5 @@
+runs/
+weights/
 data/*
 !data/.gitkeep
 models/*

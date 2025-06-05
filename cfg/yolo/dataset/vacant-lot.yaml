@@ -1,0 +1,8 @@
+path: data/yolo/0
+train: train
+validation: valid
+
+class_num: 1
+class_list: ['vacant-lot']
+
+auto_download:
